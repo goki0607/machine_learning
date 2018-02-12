@@ -1,0 +1,59 @@
+\documentclass [10pt]{article}
+
+\textheight	8.7in
+\textwidth	6.5in
+\topmargin	    0in
+\oddsidemargin  0in
+\evensidemargin 0in
+\baselineskip 15pt
+
+\usepackage{amssymb,amsmath,amstext}
+\usepackage{amsfonts}
+\usepackage{algpseudocode}
+
+\begin{document}
+\title{Intro to Machine Learning Homework Assignment 1}
+\author{Goktug Saatcioglu}
+\date{NetId: gs2417}
+\maketitle
+\begin{enumerate}
+	\item[\textbf{1.$\>$}]It is okay to weigh each per-example cost equally since we are using a Monte Carlo method to approximate the expected cost. Already, by the law of large numbers, if the random samples $x$ are i.i.d (idependently and identically distributed) then the empirical cost should converge to the expected cost. Because of this, even if every data $x$ is not equally likely to occur, taking the per-example costs and dividing by $N$ is an reasonable approach. Furthermore, most of the time (for most of the cases) we do not have access to the input distribution $p_{x}$. The Monte Carlo method allows us to estimate the distribution $p_{x}$ without knowing $p_{x}$ itself. If we were to weigh each per-example cost differently according to what we think (or estimate) how likely each $x$ is then we may introduce bias into our dataset or, if we feel the need to introduce per-example costs, possibly due to an imbalanced dataset, then it may be so that the dataset is not representative of the input distribution rather than there being a specific likelihood of occurrence for each $x$ (note: in some cases it may not even be necessary to process an imbalanced dataset).
+	\item[\textbf{2.$\>$}]The bias $b$ is necessary because the decision boundary (hyperplane) determined by our perceptron may not always occur through the origin. Thus, the bias shifts the decision boundary by some $b$ away from the origin of our space. For example, if our space were to be $\mathbb{R}^{2}$, then $b$ would be an horiziontal translation of the hyperplane $w^{T}$ by the amount of $b$. The sign function is used to determine whether our perceptron classifies an input $x$, where $x \in \mathbb{R}^{b}$, as a positive or negative classification. The perceptron is a binary classifier, meaning all $x$ must be either classified negatively or positively. For example, in the space $\mathbb{R}^{2}$, consider an $n \in \mathbb{N}$ amount of points where each point $x_{i}=(x_{i1},x_{i2})$ is such that $x_{i1} > 0$ and $x_{i2} > 0$ for all $i$. Assume that some points are labelled negatively and some points are labelled positively such that they are linearly seperable. If we do not include the bias term, i.e. $b = 0$, then $sign(w^{T}x)$ will make a large amount of wrong classifications for each iteration of the perceptron algorithm since the seperation does not occur through the origin. By our construction, we know that the seperation does not occur through the origin as $\forall x\quad x > 0$. This will lead to having an high error rate for our perceptron. Therefore, the bias is necessary in situations where the decision boundary does not go through the origin.
+	\item[\textbf{3.$\>$}]The trivial solution occurs when $w^{T}x + b = 0$ (or $w^{T}x = -b$) meaning $M(x) = 0$ but the reference machine $M^{*}(x) = 1$. This means that the distance function should not be $0$ as $M^{*}$ and $M$ disagree but this won't be the case since $w^{T}x + b = 0 \implies D(M^{*}(x),M,x) = 0$. A solution to the trivial solution should involve forcing a value on the distance function when the trivial solution occurs so that the cost function can take this misclassification into account. Consider the following if-else check.
+	\begin{algorithmic}
+		\If{$w^{T}x + b = 0 \land M^{*}(x) \ne M(x)$} $D(M^{*}(x),M,x) = -(M^{*}(x)-M(x))(-M^{*}(x)) = M^{*}(x)$ \Else \: $D(M^{*}(x),M,x) = -(M^{*}(x)-M(x))(w^{T}x+b)$ \EndIf
+	\end{algorithmic}
+	Since the distance function should be positive for all disagreements so that we can optimize the cost function, we multiply $-(M^{*}(x)-M(x))$ by $(-M^{*}(x))$ which will always evaluate to $M^{*}(x)$ when the trivial solution occurs. Thus, checking for the trivial solution and then setting $D(M^{*}(x),M,x) = M^{*}(x)$ if the trivial solution conditions occur will work. This way we can make sure to take into account that an update to the weight vector should be made when the trivial solution occurs and the possibility of a trivial solution is taken into account for the perceptron learning rule.
+	\item[\textbf{4.$\>$}]Consider the following property of the sigmoid function $\sigma$.
+	\begin{align}
+		\frac{\partial}{\partial a}\sigma(a) &= \frac{\partial}{\partial a}(\frac{1}{1+\exp(-a)}) \nonumber \\
+		&= \frac{\exp(-a)}{(1+\exp(-a))^{2}} \nonumber \\
+		&= (\frac{1}{1+\exp(-a)})(\frac{\exp(-a)}{1+\exp(-a)}) \nonumber \\
+		&= \sigma(a)(\frac{1+\exp(-a)}{1+\exp(-a)}-\frac{1}{1+\exp(-a)}) \nonumber \\
+		&= \sigma(a)(1-\sigma(a)) \nonumber \\
+		\label{4.1} \tag{4.1} \therefore \frac{\partial}{\partial a}\sigma(a) &= \sigma(a)(1-\sigma(a))
+	\end{align}
+	Using \ref{4.1} we now derive the gradient of the distance function of logistic regression with respect to the weight vector $w$.
+	\begin{align}
+		D(y^{*},w,x) &= -(y^{*}\log(M(x))+(1-y^{*})\log(1-M(x))) \nonumber \\
+		&= -(y^{*}\log(\sigma(wx))+(1-y^{*})\log(1-\sigma(wx))) \nonumber \\
+		\frac{\partial}{\partial w}D(y^{*},w,x) &= \frac{\partial}{\partial w} -(y^{*}\log(\sigma(wx))+(1-y^{*})\log(1-\sigma(wx))) \nonumber \\
+		&= -(y^{*}\frac{\partial}{\partial w}(\log(\sigma(wx)))+(1-y^{*})\frac{\partial}{\partial w}(\log(1-\sigma(wx)))) && \text{by linearity} \nonumber \\
+		&= -(y^{*}\frac{\frac{\partial}{\partial w}\sigma(wx)}{\sigma(wx)}+(1-y^{*})\frac{\frac{\partial}{\partial w}1-\sigma(wx)}{1-\sigma(wx)}) && \text{by chain rule} \nonumber \\
+		&= -(y^{*}\frac{\sigma(wx)(1-\sigma(wx))\frac{\partial}{\partial w}(wx)}{\sigma(wx)}+(1-y^{*})\frac{-(\sigma(wx)(1-\sigma(wx))\frac{\partial}{\partial w}(wx))}{1-\sigma(wx)}) && \text{by property \ref{4.1}} \nonumber \\
+		& && \text{and chain rule} \nonumber \\
+		&= -(y^{*}(1-\sigma(wx))(\frac{\partial}{\partial w}(wx))+(1-y^{*})(-\sigma(wx))(\frac{\partial}{\partial w}(wx))) && \text{simplify fractions} \nonumber \\
+		&= -(y^{*}(\frac{\partial}{\partial w}(wx))-y^{*}\sigma(wx)(\frac{\partial}{\partial w}(wx))-\sigma(wx)(\frac{\partial}{\partial w}(wx))+y^{*}\sigma(wx)(\frac{\partial}{\partial w}(wx))) && \text{expand terms} \nonumber \\
+		&= -(y^{*} - \sigma(wx))(\frac{\partial}{\partial w}(wx)) && \text{simplify} \nonumber \\
+		&= -(y^{*} - \sigma(wx))(x) && \text{evaluate $\frac{\partial}{\partial w}$} \nonumber \\
+		&= -(y^{*} - M(x))(x) && \text{$\sigma(w,x) = M(x)$} \nonumber \\
+		\label{4.2} \tag{4.2} \therefore \nabla_{w}D(y^{*},w,x) &= -(y^{*} - M(x))x
+	\end{align}
+	Thus, the gradient of the distance function of logistic regression with respect to the weight vector is given by Eq. \ref{4.2}. We can also verify Eq. \ref{4.2} with Eq. (1.14) as given in the lecture notes.
+	\begin{align}
+		\nabla_{w}D(y^{*},w,x) &= -(y^{*} - M(x))x && \text{$y^{*} = M^{*}(x)$} \nonumber \\
+		&= -(M^{*}(x)-M(x))x && \text{which equals Eq. (1.14)} \nonumber
+	\end{align}
+	\item[\textbf{5.$\>$}] See Perceptron1.ipnyb and Logtistic\%20Regression\%201.ipnyb.
+\end{enumerate}
+\end{document}
