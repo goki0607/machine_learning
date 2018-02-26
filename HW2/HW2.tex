@@ -1,0 +1,81 @@
+\documentclass [10pt]{article}
+
+\textheight	8.7in
+\textwidth	6.5in
+\topmargin	    0in
+\oddsidemargin  0in
+\evensidemargin 0in
+\baselineskip 15pt
+
+\usepackage{amssymb,amsmath,amstext}
+\usepackage{amsfonts}
+
+\begin{document}
+\title{Intro to Machine Learning Homework Assignment 2}
+\author{Goktug Saatcioglu}
+\date{NetId: gs2417}
+\maketitle
+
+\begin{enumerate}
+	\item[\textbf{1.$\>$}]We define the distance function from the lecture notes, as given by Eq. (1.32), below using $y$ instead of $M^{*}$.
+	\begin{align}
+		\label{1.32} \tag{1.32} D(y,x;M) = -(y\log(M(x))+(1-y)\log(1-M(x)))
+	\end{align}
+	Furthermore, the distance function from Eq (1.19) from the lecture notes is given below.
+	\begin{align}
+		\label{1.19} \tag{1.19} D_{\log}(y,x;M) = \frac{1}{\log2}\log(1+\exp{(-s(y,x;M))})
+	\end{align}
+	We wish to prove that Eq. (\ref{1.32}) equals Eq. (\ref{1.19}) up to a constant multiplication. To derive Eq. (\ref{1.19}) we change our label set from $y\in\{0,1\}$ to $\hat{y}\in\{-1,1\}$. This mean that we can split the problem into two cases. If $\hat{y} = 1$, then that is the same as labelling $y$ as $1$. The distance function when $y$ is $1$ is given below.
+	\begin{align}
+		D(1,x;M) &= -(\log(M(x))) \nonumber \\
+		&= -\log(\frac{1}{1+\exp{-w^{T}x}}) \nonumber \\
+		&= \log(1+\exp{-w^{T}x}) \nonumber
+	\end{align}
+	The distance function from Eq. (\ref{1.19}) when $\hat{y} = 1$ is given below.
+	\begin{align}
+		D_{\log}(1,x;M) &= \frac{1}{\log2}\log(1+\exp{(-s(1,x;M))}) \nonumber \\
+		&= \frac{1}{\log2}\log(1+\exp{(-w^{T}x)}) \nonumber
+	\end{align}
+	Thus, we see that Eq. (\ref{1.32}) is equal to Eq. (\ref{1.19}) up to the constant $\frac{1}{\log2}$ for the positive labelling case (i.e. $y = 1 \land \hat{y} = 1$). Now let us consider the case where $\hat{y} = -1$. This means that $y = 0$ as the distance function from Eq. (\ref{1.32}) is given below.
+	\begin{align}
+		D(0,x;M) &= -(\log(1-M(x))) \nonumber \\
+		&= -(\log(1-\frac{1}{1+\exp{-w^{T}x}})) \nonumber \\
+		&= -(\log(\frac{1}{1+\exp{w^{T}x}})) \nonumber \\
+		&= \log(1+\exp{w^{T}x}) \nonumber
+	\end{align}
+	Then the distance function from Eq. (\ref{1.19}) when $\hat{y} = -1$ becomes as follows.
+	\begin{align}
+		D(-1,x;M)_{\log} &= \frac{1}{\log2}\log(1+\exp{(-s(-1,x;M))}) \nonumber \\
+		&= \frac{1}{\log2}\log(1+\exp{(w^{T}x)}) \nonumber
+	\end{align}
+	This time we see Eq. (\ref{1.32}) is equal to Eq. (\ref{1.19}) up to the constant $\frac{1}{\log2}$ for the negative labelling case (i.e. $y = 0 \land \hat{y} = -1$). We conclude that for both cases Eq. (\ref{1.32}) is equal to Eq. (\ref{1.19}) up to the constant $\frac{1}{\log2}$.\\
+	The constant $\frac{1}{\log2}$ is necessary because for the 0-1 loss function if $w = 0$ then the loss function equals $1$. Since we would like the logistic loss function to be an upper bound for the 0-1 loss function, the constant $\frac{1}{\log2}$ is used. If we were to omit this then $w = 0$ would give us $D_{\log} = \log2$ which would not make our logistic loss function an upper bound of the 0-1 loss function.
+	\item[\textbf{2.$\>$}]The hinge loss function is not differentiable for all values of $s$. Specifically, if $s = 1$ (the score function), then the derivative of the hinge loss function at that point is undefined. This means that we can't use a gradient-based optimization algorithm for finding a solution that minimizes the hinge loss. Fortunately, we can use a subgradient for the hinge loss function with respect to $w$. One such possible solution could look like:
+	\begin{align}
+		\frac{\partial D_{hinge}}{\partial s_{i}} &= \begin{cases}
+			-y_{i}x_{i} & \text{if $s < 1$} \nonumber \\
+			0 & \text{otherwise} \nonumber
+		\end{cases} \text{where $i$ is an entry in a set of data.}
+	\end{align}
+	Other definitions of a subgradient can also be valid as long as at $s = 1$, the subgradient at that point is such that it is less than $-y_{i}x_{i}$. This solution is perfectly fine but other solutions have also been proposed. One alternative is the squared hinge loss and is defined as below.
+	\begin{align}
+		D_{hinge}^{2}(y,x;M) = (\max{0,1-s(y,x;M)})^{2} \nonumber
+	\end{align}
+	This function smooths the hinge loss function and allows us to use define a gradient everywhere which then allows us to use gradient-based optimization algorithms. Furthermore, there are other alternatives too such as a smoothed hinge loss seen in \cite{lossfunction} by Rennie and Srebro. Thus, even though we can't use a gradient-based optimization algorithm for finding a solution that minimizes $D_{hinge}$, we have solutions to overcome this problem and can use gradient-based optimization algorithms for differentiable alternatives to $D_{hinge}$.
+	\item[\textbf{3.$\>$}]
+	\begin{enumerate}
+		\item[(a)]As a best model we pick an $i$ and $t$ such that $\tilde{R}^{(i)}_{val,t}$ has the smallest validation cost among the $2T$ trained models. Our models were trained against the training set $D_{tra}$. We then test these trained models against the validation set $D_{val}$ and look for the smallest validation cost.
+		\item[(b)]We report the generalization error by measuring the testing cost using the best model $\tilde{R}^{(i)}_{val,t}$ we picked from part (a) and let's call this expected cost $\tilde{R}^{(i)}_{test,t}$. While the generalization error cannot be computed most of the time, we can attempt to estimate it using $\tilde{R}^{(i)}_{test,t} - \tilde{R}^{(i)}_{train,t}$ where we use $\tilde{R}^{(i)}_{test,t}$ to estimate the value of the empirical cost and $\tilde{R}^{(i)}_{train,t}$ is the expected cost. Here $i,t$ is obtained from part (a).
+	\end{enumerate}
+	\item[\textbf{4.$\>$}] See hw2.ipnyb.
+\end{enumerate}
+
+\begin{thebibliography}{5}
+	\bibitem{lossfunction}
+    Jason D. M. Rennie and Nathan Srebro.
+    \textit{Loss Functions for Preference Levels: Regression with Discrete Ordered Labels},
+    Proceedings of the IJCAI Multidisciplinary Workshop on Advances in Preference Handling,
+		180-186,
+    2005.
+\end{thebibliography}
+\end{document}
