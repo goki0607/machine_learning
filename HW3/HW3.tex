@@ -1,0 +1,86 @@
+\documentclass [10pt]{article}
+
+\textheight	8.7in
+\textwidth	6.5in
+\topmargin	    0in
+\oddsidemargin  0in
+\evensidemargin 0in
+\baselineskip 15pt
+
+\usepackage{amssymb,amsmath,amstext}
+\usepackage{amsfonts}
+
+\begin{document}
+\title{Intro to Machine Learning Homework Assignment 3}
+\author{Goktug Saatcioglu}
+\date{NetId: gs2417}
+\maketitle
+
+\begin{enumerate}
+	\item[\textbf{1.$\>$}]Using cross-validation for early-stopping will mean that we will have to pick the fold with the lowest validation cost instead of averaging out the validation costs over all folds. In other words, we would have to pick the "best fold" and use the model trained on the data as defined by that fold. However, doing this goes against the idea of cross-validation since the purpose of cross-validation is to estimate the empirical cost of a hypothesis set. By selecting the "best fold" we end up picking a model that performs exceptionally well on a particular subset of our data set. This may lead to higher generalization error as a model that performs well for a specific case is unlikely to perform well for all cases (by cases we mean subsets of datasets and future datasets we may encounter) and we could run into issues of overfitting. Thus, we cannot use cross-validation for early-stopping.
+	\item[\textbf{2.$\>$}]We derive the distance function below where $y^{*} = M^{*}(x)$.
+	\begin{align}
+		D(y^{*},M,x) &= -\log p_{y^{*}} && \text{by definition} \nonumber \\
+		&= -\log \frac{a_{y^{*}}^{+}}{\sum_{k=1}^{K} a_{k}^{+}} && \text{since $p=\frac{1}{\sum_{k=1}^{k} a_{k}^{+}}a^{+}$} \nonumber \\
+		&= -\log \frac{\exp(a_{y^{*}})}{\sum_{k=1}^{K} \exp(a_{k})} && \text{since $a^{+}=\exp(a)$} \nonumber \\
+		&= -(\log(\exp(a_{y^{*}})) - \log \sum_{k=1}^{K} \exp(a_{k})) && \text{since $a^{+}=\exp(a)>0$} \nonumber \\
+		&= -(a_{y^{*}} - \log \sum_{k=1}^{K} \exp(a_{k})) && \text{simpify terms} \nonumber \\
+		&= -a_{y^{*}} + \log \sum_{k=1}^{K} \exp(a_{k}) && \text{distribute the negative} \nonumber \\
+		\therefore D(y^{*},M,x) &= -a_{y^{*}} + \log \sum_{k=1}^{K} \exp(a_{k}) \nonumber
+	\end{align}
+	Note: Notice that we never had to use the definition of $a$, which is given by $a = W\tilde{x}$, for our deriviation of the distance function.
+	\item[\textbf{3.$\>$}]First consider the following observation.
+	\begin{align}
+		\frac{\partial}{\partial w_{y}} (\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) &= \sum_{k=1}^{K} \frac{\partial}{\partial w_{y}} \exp(w_{k}^{T}\tilde{x}) && \text{by linearity} \nonumber \\
+		&= \sum_{k=1}^{K} \begin{cases}
+			\tilde{x}\exp(w_{y}^{T}\tilde{x}), & \text{if $w_{k}=w_{y}$} \\
+			0, & \text{otherwise}
+		\end{cases} && \text{cases for the derivative} \nonumber \\
+		&= \tilde{x}\exp(w_{y}^{T}\tilde{x}) \nonumber \\
+		\label{3.1} \tag{3.1} \therefore \frac{\partial}{\partial w_{y}} (\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) &= \tilde{x}\exp(w_{y}^{T}\tilde{x})
+	\end{align}
+	Next we take the gradient of the distance function with respect to the weight vector that corresponds to the correct class outputted by the reference machine, i.e. the $y^{*}$-th row vector.
+	\begin{align}
+		\frac{\partial D(y^{*},M,x)}{\partial w_{y^{*}}} &= -\frac{\partial}{\partial w_{y^{*}}} (a_{y^{*}} - \log \sum_{k=1}^{K} \exp(a_{k})) \nonumber \\
+		&= -\frac{\partial}{\partial w_{y^{*}}} (w_{y^{*}}^{T}\tilde{x} - \log \sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) && \text{since $a=W\tilde{x}$} \nonumber \\
+		&= -(\frac{\partial}{\partial w_{y^{*}}}w_{y^{*}}^{T}\tilde{x} - \frac{\partial}{\partial w_{y^{*}}}\log \sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) && \text{by linearity} \nonumber \\
+		&= -(\tilde{x} - \frac{\partial}{\partial w_{y^{*}}} \log \sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) && \text{simplify first term} \nonumber \\
+		&= -(\tilde{x} - \frac{\partial}{\partial w_{y^{*}}}(\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) \frac{1}{\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})}) && \text{by chain rule} \nonumber \\
+		&= -(\tilde{x} - \tilde{x}\exp(w_{y^{*}}^{T}\tilde{x})\frac{1}{\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})}) && \text{using \ref{3.1}} \nonumber \\
+		&= -(1 - \frac{\exp(w_{y^{*}}^{T}\tilde{x})}{\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})})\tilde{x} && \text{factor out $\tilde{x}$} \nonumber \\
+		&= -(1 - p(C=y^{*}\:|\:x))\tilde{x} && \text{using the definition of $p(C=y^{*}\:|\:x)$} \nonumber \\
+		\label{3.2} \tag{3.2} \therefore \frac{\partial D(y^{*},M,x)}{\partial w_{y^{*}}} &= -(1 - p(C=y^{*}\:|\:x))\tilde{x}
+	\end{align}
+	Similarly, let's consider the gradient of the distance function with respect to the weight vector that corresponds to any other incorrect class.
+	\begin{align}
+		\frac{\partial D(y^{*},M,x)}{\partial w_{y}} &= -\frac{\partial}{\partial w_{y}} (a_{y^{*}} - \log \sum_{k=1}^{K} \exp(a_{k})) \nonumber \\
+		&= -\frac{\partial}{\partial w_{y}} (w_{y^{*}}^{T}\tilde{x} - \log \sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) && \text{since $a=W\tilde{x}$} \nonumber \\
+		&= -(\frac{\partial}{\partial w_{y}}w_{y^{*}}^{T}\tilde{x} - \frac{\partial}{\partial w_{y}}\log \sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) && \text{by linearity} \nonumber \\
+		&= -(0 - \frac{\partial}{\partial w_{y}} \log \sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) && \text{simplify first term} \nonumber \\
+		&= -(0 - \frac{\partial}{\partial w_{y}}(\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})) \frac{1}{\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})}) && \text{by chain rule} \nonumber \\
+		&= -(0 - \tilde{x}\exp(w_{y}^{T}\tilde{x})\frac{1}{\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})}) && \text{using \ref{3.1}} \nonumber \\
+		&= -(0 - \frac{\exp(w_{y}^{T}\tilde{x})}{\sum_{k=1}^{K} \exp(w_{k}^{T}\tilde{x})})\tilde{x} && \text{factor out $\tilde{x}$} \nonumber \\
+		&= -(0 - p(C=y\:|\:x))\tilde{x} && \text{using the definition of $p(C=y\:|\:x)$} \nonumber \\
+		\label{3.3} \tag{3.3} \therefore \frac{\partial D(y^{*},M,x)}{\partial w_{y}} &= -(0 - p(C=y\:|\:x))\tilde{x}
+	\end{align}
+	We can then combine Eq. (\ref{3.2}) and Eq. (\ref{3.3}) into a single vector equation to get the gradient of the distance function with respect to the weight matrix $W$.
+	\begin{align}
+		\label{3.4} \tag{3.4} \nabla_{W} D(y^{*},M,x) = -(y^{*}-p)\tilde{x}^{T},
+	\end{align}
+	where
+	\[
+	y^{*} =
+	\begin{bmatrix}
+		0, \\
+		\vdots, \\
+		1, \\
+		\vdots, \\
+		0
+	\end{bmatrix}
+	\leftarrow y^{*}\text{-th row,}
+	\]
+	and $p$ is given as in the lecture notes (Eq. (1.26)). Thus, Eq (\ref{3.4}) is the same equation as Eq (1.28) of the lecture notes and we have derived the learning rule.
+	\item[\textbf{4.$\>$}]See hw3.ipnyb.
+\end{enumerate}
+
+\end{document}
