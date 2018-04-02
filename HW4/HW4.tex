@@ -1,0 +1,118 @@
+\documentclass [10pt]{article}
+
+\textheight	8.7in
+\textwidth	6.5in
+\topmargin	    0in
+\oddsidemargin  0in
+\evensidemargin 0in
+\baselineskip 15pt
+
+\usepackage{amssymb,amsmath,amstext}
+\usepackage{amsfonts}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\begin{document}
+\title{Intro to Machine Learning Homework Assignment 4}
+\author{Goktug Saatcioglu}
+\date{NetId: gs2417}
+\maketitle
+
+\begin{enumerate}
+	\item[\textbf{1.$\>$}]For the 2-dimensional XOR problem, we have the following data vectors and labels:
+	\begin{alignat}{3}
+		&\textbf{x}^{1} = [-1,-1]^{\top} && \text{has label $y^{1} = 1$} \nonumber \\
+		&\textbf{x}^{2} = [1,1]^{\top} && \text{has label $y^{2} = 1$} \nonumber \\
+		&\textbf{x}^{3} = [-1,1]^{\top} && \text{has label $y^{3} = -1$} \nonumber \\
+		&\textbf{x}^{4} = [1,-1]^{\top} && \text{has label $y^{4} = -1$}. \nonumber
+	\end{alignat}
+	We use the following basis vectors:
+	\begin{align}
+		&\textbf{r}^{1} = [-1,-1]^{\top} \nonumber \\
+		&\textbf{r}^{2} = [1,1]^{\top} \nonumber \\
+		&\textbf{r}^{3} = [-1,1]^{\top} \nonumber \\
+		&\textbf{r}^{4} = [1,-1]^{\top}, \nonumber
+	\end{align}
+	and we tranform each two-dimensional input vector $\textbf{x}^{i}$ into a four-dimensional vector $\boldsymbol{\phi}(\textbf{x})$ such that$$\boldsymbol{\phi}^{i}(\textbf{x})=\exp(-\norm{\textbf{x}-\textbf{r}^{j}}^{2}),$$where $i=1,2,3,4$, $j=1,2,3,4$ and $\norm{\cdot}$ is the 2-norm of a vector (or $\norm{\textbf{x}-\textbf{r}}$ is the Euclidean distance between $x$ and $r$). We compute each $\phi^{i}$ and the results are shown below:
+	\begin{align}
+		&\boldsymbol{\phi}^{1} = [1,e^{-8},e^{-4},e^{-4}]^{\top} \nonumber \\
+		&\boldsymbol{\phi}^{2} = [e^{-8},1,e^{-4},e^{-4}]^{\top} \nonumber \\
+		&\boldsymbol{\phi}^{3} = [e^{-4},e^{-4},1,e^{-8}]^{\top} \nonumber \\
+		&\boldsymbol{\phi}^{4} = [e^{-4},e^{-4},e^{-8},1]^{\top}. \nonumber
+	\end{align}
+	Next, we let $\textbf{w}=[1,1,-1,-1]^{\top}$, $b=0$ and solve $\textbf{w}^{\top}\boldsymbol{\phi}^{i}+b$ for $i=1,2,3,4$. If the answer is greater than $0$ we label the class as $1$ and $-1$ otherwise. The results are given below:
+	\begin{alignat}{3}
+		&\textbf{w}^{\top}\boldsymbol{\phi}^{1}+b \approx 0.9637 &&\implies \text{$\textbf{x}^{1}$ has label $1=y^{1}$} \nonumber \\
+		&\textbf{w}^{\top}\boldsymbol{\phi}^{2}+b \approx 0.9637 &&\implies \text{$\textbf{x}^{2}$ has label $1=y^{2}$} \nonumber \\
+		&\textbf{w}^{\top}\boldsymbol{\phi}^{3}+b \approx -0.9637 &&\implies \text{$\textbf{x}^{3}$ has label $-1=y^{3}$} \nonumber \\
+		&\textbf{w}^{\top}\boldsymbol{\phi}^{4}+b \approx -0.9637 &&\implies \text{$\textbf{x}^{4}$ has label $-1=y^{4}$}. \nonumber
+	\end{alignat}
+	Thus, we conclude that the radial basis function network with $\textbf{w}=[1,1,-1,-1,0]^{\top}$ solves the XOR-problem.
+	\item[\textbf{2.$\>$}]In a multiclass classification setting the weight vector can be built as $\textbf{W} = [y^{1}, y^{2},\dots,y^{k}]$ where $y^{i}$ is a one-hot vector corresponding to the class which the $i$-th basis vector belongs to. This weight matrix would then have size $n\times k$ where $n$ is the number of classes we have in the multiclass classification setting and $k$ is the amount of basis vector we have chosen (which in this case is all the input vectors). This works since the mutliplication of the weight matrix $\textbf{W}$ with any of the radial bases vectors $\phi_{i}(\textbf{x})$ will return us a column vector of size $n\times 1$ because $\textbf{W}$ is of size $n\times k$ and $\phi_{i}$ is of size $k\times 1$. This column vector can be interpreted as a sort-of one hot vector where the entry with the highest value indicates the class that the input $\textbf{x}$ belongs to. Matrix multiplication happens row by columns which means that the $i$-th entry in the resulting vector from $\textbf{W}\phi_{i}(\textbf{x})$ will measure the ``likliness/similarity'' the input vector $\textbf{x}$ has to the class $i$. Technically, each $i$ in the resulting vector would measure the total inversely proportinal distance between input vector $\textbf{x}$ and the bases that are given by class $i$. Thus, the highest entry for a resulting input vector $\textbf{x}$ will be the entry its class label belongs to which means we correctly create a nearest-neighbor classifier from a radial basis function network in the multiclass classification setting. Finally, for the resulting vector we can apply a softmax transformation on the entries and select the element with the highest value to classify the input vector $\textbf{x}$.
+	\item[\textbf{3.$\>$}]With K basis vectors, the distance function, as given in the lecture notes, is$$D(y^{*},M,\phi(\textbf{x}))=-(y^{*}\log(M(\phi(\textbf{x})))+(1-y^{*})\log(1-M(\phi(\textbf{x})))),$$where $y^{*}=M^{*}(\phi(\textbf{x}))$, $M = M(\textbf{x}) = \sigma(\textbf{w}^{\top}\textbf{x}+b)$ and
+	\[
+	\phi(\textbf{x}) =
+	\begin{bmatrix}
+		\exp(-(\textbf{x}-\textbf{r}^{1})^{2}) \\
+		\vdots \\
+		\exp(-(\textbf{x}-\textbf{r}^{k})^{2})
+	\end{bmatrix}.
+	\]
+	To compute $\nabla_{\textbf{r}^{k}}D(y^{*},M,\phi(\textbf{x}))$ we compute the partials $\frac{\partial D}{\partial a}$, $\frac{\partial a}{\partial \phi_{k}(\textbf{x})}$ and $\nabla_{\textbf{r}^{k}} \phi_{k}(\textbf{x})$ where $a=\textbf{w}^{\top}\phi(\textbf{x})+b$ such that $$\frac{\partial D}{\partial a} \frac{\partial a}{\partial \phi_{k}(\textbf{x})} \nabla_{\textbf{r}^{k}} \phi_{k}(\textbf{x}) = \nabla_{\textbf{r}^{k}}D(y^{*},M,\phi(\textbf{x})).$$We start with $\frac{\partial D}{\partial a}$:
+	\begin{align}
+		\frac{\partial D}{\partial a} &= \frac{\partial}{\partial a} (-(y^{*}\log(M(\phi(\textbf{x})))+(1-y^{*})\log(1-M(\phi(\textbf{x}))))) \nonumber \\
+		&= \frac{\partial}{\partial a} (-(y^{*}\log(\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b))+(1-y^{*})\log(1-\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b)))) && \text{using the definition of $M$} \nonumber\\
+		&= \frac{\partial}{\partial a} (-(y^{*}\log(\sigma(a))+(1-y^{*})\log(1-\sigma(a)))) && \text{since $a = \textbf{w}^{\top}\phi(\textbf{x})+b$} \nonumber \\
+		&= -(y^{*}\frac{\partial}{\partial a}(\log(\sigma(a)))+(1-y^{*})\frac{\partial}{\partial a}(\log(1-\sigma(a)))) && \text{by linearity} \nonumber \\
+		&= -(y^{*}\frac{\frac{\partial}{\partial a} \sigma(a)}{\sigma(a)}+(1-y^{*})\frac{\frac{\partial}{\partial a} (1- \sigma(a))}{1-\sigma(a)}) && \text{by chain rule} \nonumber \\
+		&= -(y^{*}\frac{\sigma(a)(1-\sigma(a))\frac{\partial}{\partial a} a}{\sigma(a)}+(1-y^{*})\frac{-\sigma(a)(1-\sigma(a)) \frac{\partial}{\partial a}}{1-\sigma(a)}) && \text{by chain rule and since} \nonumber \\
+		& && \text{$\frac{\partial}{\partial x}\sigma(x) = \sigma(x)(1-\sigma(x))$} \nonumber \\
+		&= -(y^{*}(1-\sigma(a))+(1-y^{*})-\sigma(a)) && \text{simplify fractions} \nonumber \\
+		&= -(y^{*}-y^{*}\sigma(a)-\sigma(a)+y^{*}\sigma(a)) && \text{expand terms} \nonumber \\
+		&= -(y^{*}-\sigma(a)) && \text{simplify terms} \nonumber \\
+		&= -(y^{*}-\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b)) && \text{since $a = \textbf{w}^{\top}\phi(\textbf{x})+b$} \nonumber \\
+		\therefore \frac{\partial D}{\partial a} &= -(y^{*}-\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b)) \nonumber
+	\end{align}
+	Next we solve $\frac{\partial a}{\partial \phi_{k}(\textbf{x})}$:
+	\begin{align}
+		\frac{\partial a}{\partial \phi_{k}(\textbf{x})} &= \frac{\partial}{\partial \phi_{k}(\textbf{x})} a \nonumber \\
+		&= \frac{\partial}{\partial \phi_{k}(\textbf{x})} (\textbf{w}^{\top}\phi(\textbf{x})+b) && \text{since $a=\textbf{w}^{\top}\phi(\textbf{x})+b$} \nonumber \\
+		&= w_{k} && \text{since $\frac{\partial}{\partial \phi_{k}(\textbf{x})} (\textbf{w}^{\top}\phi(\textbf{x}))=w_{k}$} \nonumber \\
+		\therefore \frac{\partial a}{\partial \phi_{k}(\textbf{x})} &= w_{k} \nonumber
+	\end{align}
+	Finally we solve $\nabla_{\textbf{r}^{k}} \phi_{k}(\textbf{x})$:
+	\begin{align}
+		\nabla_{\textbf{r}^{k}} \phi_{k}(\textbf{x}) &= \frac{\partial}{\partial \textbf{r}^{k}} (
+		\begin{bmatrix}
+			\exp(-(\textbf{x}-\textbf{r}^{1})^{2}) \\
+			\vdots \\
+			\exp(-(\textbf{x}-\textbf{r}^{k})^{2})
+		\end{bmatrix} ) \nonumber \\
+		&= \begin{bmatrix}
+			\frac{\partial}{\partial \textbf{r}^{k}} (\exp(-(\textbf{x}-\textbf{r}^{1})^{2})) \\
+			\vdots \\
+			\frac{\partial}{\partial \textbf{r}^{k}} (\exp(-(\textbf{x}-\textbf{r}^{k})^{2}))
+		\end{bmatrix} && \text{by linearity} \nonumber \\
+		&= \begin{bmatrix}
+			0 \\
+			\vdots \\
+			(\exp(-(\textbf{x}-\textbf{r}^{k})^{2}))(-2(\textbf{x}-\textbf{r}^{k}))
+		\end{bmatrix} && \text{by chain rule} \nonumber \\
+		&= \begin{bmatrix}
+			0 \\
+			\vdots \\
+			2\phi_{k}(\textbf{x})(\textbf{x}-\textbf{r}^{k})
+		\end{bmatrix} && \text{since $\exp(-(\textbf{x}-\textbf{r}^{k})^{2})=\phi_{k}(\textbf{x})$} \nonumber \\
+		&= 2\phi_{k}(\textbf{x})(\textbf{x}-\textbf{r}^{k}) && \text{since all entries bu $k$ is zero} \nonumber \\
+		\therefore \nabla_{\textbf{r}^{k}} \phi_{k}(\textbf{x}) &= 2\phi_{k}(\textbf{x})(\textbf{x}-\textbf{r}^{k}) \nonumber
+	\end{align}
+	Combining all three together:
+	\begin{align}
+		\frac{\partial D}{\partial a} \frac{\partial a}{\partial \phi_{k}(\textbf{x})} \nabla_{\textbf{r}^{k}} \phi_{k}(\textbf{x}) &= (-(y^{*}-\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b)))(w_{k})(2\phi_{k}(\textbf{x})(\textbf{x}-\textbf{r}^{k})) \nonumber \\
+		&= -2(y^{*}-\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b))w_{k}\phi_{k}(\textbf{x})(\textbf{x}-\textbf{r}^{k}) \nonumber \\
+		\therefore \nabla_{\textbf{r}^{k}}D(y^{*},M,\phi(\textbf{x})) &= -2(y^{*}-\sigma(\textbf{w}^{\top}\phi(\textbf{x})+b))w_{k}\phi_{k}(\textbf{x})(\textbf{x}-\textbf{r}^{k}) \nonumber
+	\end{align}
+	Thus, we have derived the gradient asked by the question and our answer is the same as the answer given in the lecture notes which verifies our solution.
+\end{enumerate}	
+
+\end{document}
