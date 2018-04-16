@@ -127,18 +127,22 @@
 	\end{enumerate}
 	\newpage
 	\item[\textbf{3.$\>$}]
-	We define $M(x) = W^{\top}x$ where $W$ is a weight vector (or matrix since a vector is a special case of a matrix) with an extra $1$ attached at the end (for the bias) and $x$ is an input vector. We can then use $D_{\text{tra}}$ and the distance function $D$ to define empirical cost function $\hat{R}$ as follows$$\hat{R}(M,D_{\text{tra}})=\frac{1}{N}\sum_{n=1}^{N}\norm{y_{n}^{*}-M(x_{n})}^{2}_{2}=\frac{1}{N}\sum_{n=1}^{N}\norm{y_{n}^{*}-W^{\top}x_{n}}^{2}_{2}=\frac{1}{N}\sum_{n=1}^{N}(y_{n}^{*}-W^{\top}x_{n})^{2}.$$Thus, to minimize the emprical cost we can take the derivative of $\hat{R}$ with respect to $W$. First, we re-write $\hat{R}$ to make the differentiation easier $$\frac{1}{N}\sum_{n=1}^{N}(y_{n}^{*}-W^{\top}x_{n})^{2}=\frac{1}{N}(Y-XW)^{\top}(Y-XW),$$where $X\in\mathbb{R}^{N\times d}$ is the matrix of $N$ input row vectors $x_{n}\in\mathbb{R}^{d}$ with $d$ ``features'' and $Y\in\mathbb{R}^{N}$ is the N-dimensional output column vector. We also note that for two column vectors $x$ and $y$ which are compatible$$\frac{\partial}{\partial x}x^{\top}y=\frac{\partial}{\partial x}y^{\top}x=y.$$Also, for a column vector $x$ and a matrix $A$ which are compatible$$\frac{\partial}{\partial x}x^{\top}Ax=(A+A^{\top})x,$$which simplifies to $\frac{\partial}{\partial x}x^{\top}Ax=2Ax$ if $A$ is symmetric. We can now compute $\nabla_{W}\hat{R}$ using the properties described above.
+	We define $M(x) = W^{\top}x$ where $W$ is a weight matrix and $x$ is an input vector. We can then use $D_{\text{tra}}$ and the distance function $D$ to define empirical cost function $\hat{R}$ as follows$$\hat{R}(M,D_{\text{tra}})=\frac{1}{N}\sum_{n=1}^{N}\norm{y_{n}^{*}-M(x_{n})}^{2}_{2}=\frac{1}{N}\sum_{n=1}^{N}\norm{y_{n}^{*}-W^{\top}x_{n}}^{2}_{2}=\frac{1}{N}\sum_{n=1}^{N}(y_{n}^{*}-W^{\top}x_{n})^{2}.$$Thus, to minimize the emprical cost we can take the derivative of $\hat{R}$ with respect to $W$. First, we re-write $\hat{R}$ to make the differentiation easier $$\frac{1}{N}\sum_{n=1}^{N}(y_{n}^{*}-W^{\top}x_{n})^{2}=\frac{1}{N}(Y-XW)^{\top}(Y-XW),$$where $X\in\mathbb{R}^{d\times N}$ is the matrix of $N$ input column vectors each with $d$ ``features'' and $Y\in\mathbb{R}^{q\times N}$ is the matrix of $N$ $q-dimensional$ output column vectors. We now compute $\nabla_{W}\hat{R}$.
 	\begin{align}
 		\nabla_{W}\hat{R}&=\nabla_{W}(\frac{1}{N}(Y-XW)^{\top}(Y-XW))\nonumber\\
 		&=\nabla_{W}(\frac{1}{N}(Y^{\top}-W^{\top}X^{\top})(Y-XW))&&\text{evaluate transpose}\nonumber\\
 		&=\nabla_{W}(\frac{1}{N}(Y^{\top}Y-Y^{\top}XW-W^{\top}X^{\top}Y+W^{\top}X^{\top}XW))&&\text{multiply terms}\nonumber\\
 		&=\nabla_{W}(\frac{1}{N}(Y^{\top}Y-2W^{\top}X^{\top}Y+W^{\top}X^{\top}XW))&&\text{collect like terms}\nonumber\\
-		&=\frac{1}{N}(\nabla_{W}(Y^{\top}Y)-\nabla_{W}(2W^{\top}X^{\top}Y)+\nabla_{W}(W^{\top}X^{\top}XW)&&\text{by linearity}\nonumber\\
-		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+2X^{\top}XW)&&\text{since $X^{\top}X$ is symmetric}\nonumber\\
-		&=\frac{1}{N}(-2X^{\top}Y+2X^{\top}XW)&&\text{since $X^{\top}Y$ is a vector}\nonumber\\
-		\therefore\nabla_{W}\hat{R}&=\frac{1}{N}(-2X^{\top}Y+2X^{\top}XW)=0\nonumber
+		&=\frac{1}{N}(\nabla_{W}(Y^{\top}Y)-\nabla_{W}(2W^{\top}X^{\top}Y)+\nabla_{W}(W^{\top}X^{\top}XW))&&\text{by linearity}\nonumber\\
+		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+\nabla_{W}(W^{\top}X^{\top}XW))&&\text{evaluate gradient}\nonumber\\
+		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+\nabla_{W}((W^{\top}X^{\top})(XW)))&&\text{express as product}\nonumber\\
+		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+\nabla_{W}(W^{\top}X^{\top})(XW)+(W^{\top}X^{\top})\nabla_{W}(XW))&&\text{product rule}\nonumber\\
+		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+X^{\top}XW+W^{\top}X^{\top}X)&&\text{evaluate gradient}\nonumber\\
+		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+2X^{\top}XW)&&\text{collect like terms}\nonumber\\
+		&=\frac{1}{N}(-2X^{\top}Y+2X^{\top}XW)&&\text{evaluate gradient}\nonumber\\
+		\therefore\nabla_{W}\hat{R}&=\frac{1}{N}(-2X^{\top}Y+2X^{\top}XW)=0\implies X^{\top}XW=X^{\top}Y\nonumber
 	\end{align}
-	Thus, we see that when $X^{\top}XW=X^{\top}Y$ then $\hat{R}$ is minimized. We can confirm this by calculating$$\nabla_{W}^{2}\hat{R}=\nabla_{W}(\frac{1}{N}(X^{\top}XW-X^{\top}Y))=\nabla_{W}(\frac{1}{N}\sum_{n=1}^{N}x_{n}(y_{n}^{*}-W^{\top}x_{n}))=\frac{1}{N}\sum_{n=1}^{N}(x_{n}^{2})>0$$which implies that our solution is a minimum by the second derivative test. Assuming $X$ has full rank, we can now use the Moore-Penrose pseudoinverse of $X$, which is given by $X^{+}=(X^{\top}X)^{-1}X^{\top}$, and since $X^{\top}X$ is invertible (due to our assumption of full rank) we re-write our optimal solution as$$W=(X^{\top}X)^{-1}X^{\top}Y,$$and then use the definition of $X^{+}$ to get the optimal weight matrix$$W=X^{+}Y.$$ (Note: If $X$ does not have full rank then $X^{+}$ can instead be computed using the SVD of $X$.)
+	Thus, we see that when $X^{\top}XW=X^{\top}Y$ then $\hat{R}$ is minimized. We can confirm this as the cost function is quadratic and convex due to the squaring of the $\ell_{2}$ norm which implies that it has only a single extreme point and this point is a minimum. Assuming $X$ has full rank, we can now use the Moore-Penrose pseudoinverse of $X$, which is given by $X^{+}=(X^{\top}X)^{-1}X^{\top}$, and since $X^{\top}X$ is invertible (due to our assumption of full rank) we re-write our optimal solution as$$W=(X^{\top}X)^{-1}X^{\top}Y,$$and then use the definition of $X^{+}$ to get the optimal weight matrix$$W=X^{+}Y.$$ (Note: If $X$ does not have full rank then $X^{+}$ can instead be computed using the SVD of $X$.)
 	\newpage
 	\item[\textbf{4.$\>$}]
 	\begin{enumerate}
