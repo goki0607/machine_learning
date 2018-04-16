@@ -1,0 +1,202 @@
+\documentclass [10pt]{article}
+
+\textheight	8.7in
+\textwidth	6.5in
+\topmargin	    0in
+\oddsidemargin  0in
+\evensidemargin 0in
+\baselineskip 15pt
+
+\usepackage{amssymb,amsmath,amstext}
+\usepackage{amsfonts}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\begin{document}
+\title{Intro to Machine Learning Homework Assignment 5}
+\author{Goktug Saatcioglu}
+\date{NetId: gs2417}
+\maketitle
+
+\begin{enumerate}
+	\item[\textbf{1.$\>$}]We know that the determinant of a diagonal matrix is given by the multiplication of its diagonal elements. In our case the product$$\left|\Sigma\right|=\prod_{i=1}^{d}\sigma_{i}^{2}$$gives us the determinant of the covariance matrix $\Sigma$. Furthermore, the inverse of a diagonal matrix is given as $1$ over its diagonal elements. In our case
+	\[\Sigma^{-1}=
+	\begin{bmatrix}
+		\frac{1}{\sigma_{1}^{2}} & 0 & \dots & 0 \\
+		0 & \frac{1}{\sigma_{2}^{2}} & \dots & 0 \\
+		\vdots & 0 & \dots & 0 \\
+		\vdots & \vdots & \dots & \vdots \\
+		0 & 0 & \dots & \frac{1}{\sigma_{d}^{2}}
+	\end{bmatrix}
+	\]
+	gives us the inverse of the covariance matrix $\Sigma$, denoted by $\Sigma^{-1}$. We begin by re-writing $\frac{1}{Z}$ in product form. $\frac{1}{Z}$ as given in the question is defined as$$\frac{1}{Z} = (2\pi)^{-\frac{d}{2}}\left|\Sigma\right|^{-\frac{1}{2}}$$which can then be re-written as$$\frac{1}{Z} = \frac{1}{\sqrt{(2\pi)^{d}}}\frac{1}{\sqrt{\left|\Sigma\right|}}.$$Let's first consider the second fraction involving the determinant of the covariance matrix. We know that$$\frac{1}{\sqrt{\left|\Sigma\right|}}=\frac{1}{\sqrt{\left|\Sigma\right|=\prod_{i=1}^{d}\sigma_{i}^{2}}}=\frac{1}{\left|\Sigma\right|=\prod_{i=1}^{d}\sigma_{i}}=\prod_{i=1}^{d}\frac{1}{\sigma_{i}}.$$Similarly, we can now re-write the first fraction in product form as follows$$\frac{1}{\sqrt{(2\pi)^{d}}}=\frac{1}{\sqrt{\prod_{i=1}^{d}2\pi}}=\prod_{i=1}^{d}\frac{1}{\sqrt{2\pi}}.$$Using our results from above, we can re-write $\frac{1}{Z}$ as follows$$\frac{1}{Z} = \frac{1}{\sqrt{(2\pi)^{d}}}\frac{1}{\sqrt{\left|\Sigma\right|}}=\prod_{i=1}^{d}\frac{1}{\sqrt{2\pi}}\prod_{i=1}^{d}\frac{1}{\sigma_{i}}=\prod_{i=1}^{d}\frac{1}{\sqrt{2\pi}\sigma_{i}}.$$Now let's consider the term $$\exp(-\frac{1}{2}(x-\mu)^{\top}\Sigma^{-1}(x-\mu))$$which we then consider first the multiplication of $\Sigma^{-1}$, which is a $d\times d$ matrix, by $x-\mu$, which is a $d\times 1$ column matrix. This multiplication gives us
+	\[
+	\Sigma^{-1}(x-\mu)=
+	\begin{bmatrix}
+		\frac{1}{\sigma_{1}^{2}} & 0 & \dots & 0 \\
+		0 & \frac{1}{\sigma_{2}^{2}} & \dots & 0 \\
+		\vdots & 0 & \dots & 0 \\
+		\vdots & \vdots & \dots & \vdots \\
+		0 & 0 & \dots & \frac{1}{\sigma_{d}^{2}}
+	\end{bmatrix}
+	\begin{bmatrix}
+		x_{1} - \mu_{1} \\
+		x_{2} - \mu_{2} \\
+		\vdots \\
+		x_{d} - \mu_{d}
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		\frac{x_{1} - \mu_{1}}{\sigma_{1}^{2}} \\
+		\frac{x_{2} - \mu_{2}}{\sigma_{2}^{2}} \\
+		\vdots \\
+		\frac{x_{d} - \mu_{d}}{\sigma_{d}^{2}}
+	\end{bmatrix}.
+	\]
+	Then we multiply the $1\times d$ row vector by the $d\times 1$ column vector $(x-\mu)^{\top}$ by $\Sigma^{-1}(x-\mu)$ (which is essentially a dot product) to get
+	\[
+	(x-\mu)^{\top}\Sigma^{-1}(x-\mu)=
+	\begin{bmatrix}
+		x_{1} - \mu_{1} & x_{2} - \mu_{2} & \dots & x_{d}- \mu_{d}
+	\end{bmatrix}
+	\begin{bmatrix}
+		\frac{x_{1} - \mu_{1}}{\sigma_{1}^{2}} \\
+		\frac{x_{2} - \mu_{2}}{\sigma_{2}^{2}} \\
+		\vdots \\
+		\frac{x_{d} - \mu_{d}}{\sigma_{d}^{2}}
+	\end{bmatrix}
+	\]
+	which then gives us$$\frac{(x_{1} - \mu_{1})^{2}}{\sigma_{1}^{2}}+\frac{(x_{2} - \mu_{2})^{2}}{\sigma_{2}^{2}}+\dots+\frac{(x_{d} - \mu_{d})^{2}}{\sigma_{d}^{2}}=\sum_{i=1}^{d}\frac{(x_{i} - \mu_{i})^{2}}{\sigma_{i}^{2}}.$$Thus, we see that$$\exp(-\frac{1}{2}(x-\mu)^{\top}\Sigma^{-1}(x-\mu))=\exp(-\frac{1}{2}\sum_{i=1}^{d}\frac{(x_{i} - \mu_{i})^{2}}{\sigma_{i}^{2}}),$$which then can be written in product form using the property $\exp(x+y)=\exp(x)\exp(y)$ which gives us$$\exp(-\frac{1}{2}(x-\mu)^{\top}\Sigma^{-1}(x-\mu))=\prod_{i=1}^{d}\exp(-\frac{1}{2}\frac{(x_{i}-\mu_{i})^{2}}{\sigma_{i}^{2}}).$$Finally, we can combine all our results together to re-write $f(x)$ as follows
+	\begin{align}
+		f(x)&=\frac{1}{Z}\exp(-\frac{1}{2}(x-\mu)^{\top}\Sigma^{-1}(x-\mu))\nonumber\\
+		&=\prod_{i=1}^{d}\frac{1}{\sqrt{2\pi}\sigma_{i}}\prod_{i=1}^{d}\exp(-\frac{1}{2}\frac{(x_{i}-\mu_{i})^{2}}{\sigma_{i}^{2}})\nonumber\\
+		&=\prod_{i=1}^{d}\frac{1}{\sqrt{2\pi}\sigma_{i}}\exp(-\frac{1}{2}\frac{1}{\sigma_{i}^{2}}(x_{i}-\mu_{i})^{2})\nonumber\\
+		\therefore f(x)&=\prod_{i=1}^{d}\frac{1}{\sqrt{2\pi}\sigma_{i}}\exp(-\frac{1}{2}\frac{1}{\sigma_{i}^{2}}(x_{i}-\mu_{i})^{2})\nonumber,
+	\end{align}
+	which proves the property we seek to prove.
+	\newpage
+	\item[\textbf{2.$\>$}]
+	\begin{enumerate}
+		\item[(a)]Consider the conditional probability of an event $X$ given event $Y$ which is defined as$$p(X\mathbin{\vert}Y)=\frac{p(X\cap Y)}{p(Y)},$$which then can be re-written as$$p(X\cap Y)=p(X\mathbin{\vert}Y)p(Y).$$Also consider the conitional probability of an event $Y$ given event $X$ which is defined as$$p(Y\mathbin{\vert}X)=\frac{p(Y\cap X)}{p(X)}$$which can then be re-written as$$p(Y\cap X)=p(Y\mathbin{\vert}X)p(X).$$Since $p(X\cap Y)=p(Y\cap X)$, we can set both sides to each other and get the following equation$$p(X\mathbin{\vert}Y)p(Y)=p(Y\mathbin{\vert}X)p(X).$$Dividing both sides by $p(X)$ gives us$$p(Y\mathbin{\vert}X)=\frac{p(X\mathbin{\vert}Y)p(Y)}{p(X)},$$which proves that Bayes' rule is true.
+		\item[(b)]$\mathbb{E}[X+Y]$ where $X$ and $Y$ are discrete random variables is given by$$\mathbb{E}[X+Y]=\sum_{x,y\in\Omega}(x+y)p(x,y).$$We also know that from the law of total probability that
+		\begin{equation}\label{eq:1}
+			\sum_{y\in\Omega}p(x,y)=p(x),
+		\end{equation}
+		and
+		\begin{equation}\label{eq:2}
+			\sum_{x\in\Omega}p(x,y)=p(y).
+		\end{equation}
+		Thus, we can then expand this definition as follows
+		\begin{align}
+			\mathbb{E}[X+Y]&=\sum_{x,y\in\Omega}(x+y)p(x,y)\nonumber\\
+			&=\sum_{x,y\in\Omega}xp(x,y)+\sum_{x,y\in\Omega}yp(x,y)\nonumber\\
+			&=\sum_{x\in\Omega}x\sum_{y\in\Omega}p(x,y)+\sum_{y\in\Omega}y\sum_{x\in\Omega}p(x,y)\nonumber\\
+			&=\sum_{x\in\Omega}xp(x)+\sum_{y\in\Omega}yp(y)&&\text{by (\ref{eq:1}) and (\ref{eq:2})}\nonumber\\
+			&=\mathbb{E}[X]+\mathbb{E}[Y]&&\text{by definition}\nonumber\\
+			\therefore\mathbb{E}[X+Y]&=\mathbb{E}[X]+\mathbb{E}[Y],\nonumber
+		\end{align}
+		which proves the property we seek to prove.
+		\item[(c)]$\mathbb{E}[cX]$ where $X$ is a discrete random variable and $c\in\mathbb{R}$ is a scalar that is not a random variable is given by$$\mathbb{E}[cX]=c\mathbb{E}[X].$$This one is more straightforward to prove and we again expand the definition as follows
+		\begin{align}
+			\mathbb{E}[cX]&=\sum_{x\in\Omega}cxp(x)\nonumber\\
+			&=c\sum_{x\in\Omega}xp(x)\nonumber\\
+			&=c\mathbb{E}[X]&&\text{by definition}\nonumber\\
+			\therefore\mathbb{E}[cX]&=c\mathbb{E}[X],\nonumber
+		\end{align}
+		which proves the property we seek to prove.
+		\item[(d)]$\text{Var}(X)$ where $X$ is a discrete random variable is given by$$\sum_{x\in\Omega}(x-\mathbb{E}[X])^{2}p(x),$$which can be also written as$$\mathbb{E}[(X-\mathbb{E}[X])^{2}].$$We also know that
+		\begin{equation}\label{eq:3}
+			\mathbb{E}[\mathbb{E}[X]]=\mathbb{E}[X],
+		\end{equation}
+		and
+		\begin{equation}\label{eq:4}
+			\mathbb{E}[X\mathbb{E}[X]]=\mathbb{E}[X]\mathbb{E}[X]=\mathbb{E}[X]^{2}.
+		\end{equation}
+		We then expand the definition as follows
+		\begin{align}
+			\text{Var}(X)&=\sum_{x\in\Omega}(x-\mathbb{E}[X])^{2}p(x)\nonumber\\
+			&=\mathbb{E}[(X-\mathbb{E}[X])^{2}]\nonumber\\
+			&=\mathbb{E}[(X^{2}-2X\mathbb{E}[X]+\mathbb{E}[X]^{2})]\nonumber\\
+			&=\mathbb{E}[X^{2}]-\mathbb{E}[2X\mathbb{E}[X]]+\mathbb{E}[\mathbb{E}[X]^{2}]&&\text{by linearity}\nonumber\\
+			&=\mathbb{E}[X^{2}]-2\mathbb{E}[X]^{2}+\mathbb{E}[\mathbb{E}[X]^{2}]&&\text{by (\ref{eq:3}) and (\ref{eq:4})}\nonumber\\
+			&=\mathbb{E}[X^{2}]-2\mathbb{E}[X]^{2}+\mathbb{E}[X]^{2}&&\text{by (\ref{eq:4})}\nonumber\\
+			&=\mathbb{E}[X^{2}]-\mathbb{E}[X]^{2}\nonumber\\
+			\therefore\text{Var}(X)&=\mathbb{E}[X^{2}]-\mathbb{E}[X]^{2},\nonumber
+		\end{align}
+		which proves the property we seek to prove.
+	\end{enumerate}
+	\newpage
+	\item[\textbf{3.$\>$}]
+	We define $M(x) = W^{\top}x$ where $W$ is a weight vector (or matrix since a vector is a special case of a matrix) with an extra $1$ attached at the end (for the bias) and $x$ is an input vector. We can then use $D_{\text{tra}}$ and the distance function $D$ to define empirical cost function $\hat{R}$ as follows$$\hat{R}(M,D_{\text{tra}})=\frac{1}{N}\sum_{n=1}^{N}\norm{y_{n}^{*}-M(x_{n})}^{2}_{2}=\frac{1}{N}\sum_{n=1}^{N}\norm{y_{n}^{*}-W^{\top}x_{n}}^{2}_{2}=\frac{1}{N}\sum_{n=1}^{N}(y_{n}^{*}-W^{\top}x_{n})^{2}.$$Thus, to minimize the emprical cost we can take the derivative of $\hat{R}$ with respect to $W$. First, we re-write $\hat{R}$ to make the differentiation easier $$\frac{1}{N}\sum_{n=1}^{N}(y_{n}^{*}-W^{\top}x_{n})^{2}=\frac{1}{N}(Y-XW)^{\top}(Y-XW),$$where $X\in\mathbb{R}^{N\times d}$ is the matrix of $N$ input row vectors $x_{n}\in\mathbb{R}^{d}$ with $d$ ``features'' and $Y\in\mathbb{R}^{N}$ is the N-dimensional output column vector. We also note that for two column vectors $x$ and $y$ which are compatible$$\frac{\partial}{\partial x}x^{\top}y=\frac{\partial}{\partial x}y^{\top}x=y.$$Also, for a column vector $x$ and a matrix $A$ which are compatible$$\frac{\partial}{\partial x}x^{\top}Ax=(A+A^{\top})x,$$which simplifies to $\frac{\partial}{\partial x}x^{\top}Ax=2Ax$ if $A$ is symmetric. We can now compute $\nabla_{W}\hat{R}$ using the properties described above.
+	\begin{align}
+		\nabla_{W}\hat{R}&=\nabla_{W}(\frac{1}{N}(Y-XW)^{\top}(Y-XW))\nonumber\\
+		&=\nabla_{W}(\frac{1}{N}(Y^{\top}-W^{\top}X^{\top})(Y-XW))&&\text{evaluate transpose}\nonumber\\
+		&=\nabla_{W}(\frac{1}{N}(Y^{\top}Y-Y^{\top}XW-W^{\top}X^{\top}Y+W^{\top}X^{\top}XW))&&\text{multiply terms}\nonumber\\
+		&=\nabla_{W}(\frac{1}{N}(Y^{\top}Y-2W^{\top}X^{\top}Y+W^{\top}X^{\top}XW))&&\text{collect like terms}\nonumber\\
+		&=\frac{1}{N}(\nabla_{W}(Y^{\top}Y)-\nabla_{W}(2W^{\top}X^{\top}Y)+\nabla_{W}(W^{\top}X^{\top}XW)&&\text{by linearity}\nonumber\\
+		&=\frac{1}{N}(-\nabla_{W}(2W^{\top}X^{\top}Y)+2X^{\top}XW)&&\text{since $X^{\top}X$ is symmetric}\nonumber\\
+		&=\frac{1}{N}(-2X^{\top}Y+2X^{\top}XW)&&\text{since $X^{\top}Y$ is a vector}\nonumber\\
+		\therefore\nabla_{W}\hat{R}&=\frac{1}{N}(-2X^{\top}Y+2X^{\top}XW)=0\nonumber
+	\end{align}
+	Thus, we see that when $X^{\top}XW=X^{\top}Y$ then $\hat{R}$ is minimized. We can confirm this by calculating$$\nabla_{W}^{2}\hat{R}=\nabla_{W}(\frac{1}{N}(X^{\top}XW-X^{\top}Y))=\nabla_{W}(\frac{1}{N}\sum_{n=1}^{N}x_{n}(y_{n}^{*}-W^{\top}x_{n}))=\frac{1}{N}\sum_{n=1}^{N}(x_{n}^{2})>0$$which implies that our solution is a minimum by the second derivative test. Assuming $X$ has full rank, we can now use the Moore-Penrose pseudoinverse of $X$, which is given by $X^{+}=(X^{\top}X)^{-1}X^{\top}$, and since $X^{\top}X$ is invertible (due to our assumption of full rank) we re-write our optimal solution as$$W=(X^{\top}X)^{-1}X^{\top}Y,$$and then use the definition of $X^{+}$ to get the optimal weight matrix$$W=X^{+}Y.$$ (Note: If $X$ does not have full rank then $X^{+}$ can instead be computed using the SVD of $X$.)
+	\newpage
+	\item[\textbf{4.$\>$}]
+	\begin{enumerate}
+		\item[(a)]For notational convenience let $f=f(x)$ and $\hat{f}=\hat{f}(x;\Theta)$. We begin by considering the minimum L$2$ loss for a single example $x$ where $x$ is a random variable. We wish to find to find a $\hat{f}$ such that $\mathbb{E}_{x}$ is at a minimum which can be done by removing and adding $f$ to the equation. We re-write the expectation and simplify the terms.
+		\begin{align}
+			\mathbb{E}_{x}[(y-\hat{f})^{2}]&=\mathbb{E}_{x}[(y-f+f-\hat{f})^{2}]\nonumber\\
+			&=\mathbb{E}_{x}[((y-f)+(f-\hat{f}))^{2}]&&\text{collect terms}\nonumber\\
+			&=\mathbb{E}_{x}[(y-f)^{2}-2(y-f)(f-\hat{f})+(f-\hat{f})^{2}]&&\text{expand terms}\nonumber\\
+			&=\mathbb{E}_{x}[(y-f)^{2}]-\mathbb{E}_{x}[2(y-f)(f-\hat{f})]+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{by linearity}\nonumber\\
+			&=\mathbb{E}_{x}[(y-f)^{2}]-\mathbb{E}_{x}[2(f+\epsilon-f)(f-\hat{f})]+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{since $y = f + \epsilon$}\nonumber\\
+			&=\mathbb{E}_{x}[(y-f)^{2}]-2\mathbb{E}_{x}[(\epsilon)(f-\hat{f})]+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{take out constant}\nonumber\\
+			&=\mathbb{E}_{x}[(y-f)^{2}]-2\mathbb{E}_{x}[\epsilon]\mathbb{E}_{x}[f-\hat{f}]+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{since $\epsilon$ is a random}\nonumber\\
+			& &&\text{independent variable}\nonumber\\
+			&=\mathbb{E}_{x}[(y-f)^{2}]+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{since $\mathbb{E}_{x}[\epsilon] = 0$}\nonumber\\
+			&=\mathbb{E}_{x}[(f+\epsilon-f)^{2}]+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{since $y = f + \epsilon$}\nonumber\\
+			&=\sigma^{2}+\mathbb{E}_{x}[(f-\hat{f})^{2}]&&\text{since $\mathbb{E}_{x}[\epsilon^{2}] = \sigma^{2}$}\nonumber\\
+			& &&\text{see derivation in (b)}\nonumber\\
+			\therefore\mathbb{E}_{x}[(y-\hat{f})^{2}]&=\sigma^{2}+\mathbb{E}_{x}[(f-\hat{f})^{2}]\nonumber
+		\end{align}
+		Notice that the the value $f-\hat{f}$ is squared meaning whatever the value is, it will become positive and contribute positively to the constant $\sigma^{2}$. Thus, setting $\hat{f}=f$ means the second term will become zero and we will achieve a minimum L$2$ loss with the minimum loss being $\sigma^{2}$. We can then expand the single example case to a vector $X$ and the distribution $Y = f(X) + \epsilon$ as the derivation of $\mathbb{E}_{X}$ will be identical to the derivation of $\mathbb{E}_{x}$ except this time we consider vectors. Since the L$2$ loss is minimized if the difference between each entry between $X$ and $\hat{f}(X;\Theta)$ is minimized it is easy to see that choosing a $\hat{f}$ such that $\hat{f}(X;\Theta)=X$ will lead to a value of zero for the term $(f(X)-\hat{f}(X;\Theta))^{2}$ which again leads to a minimum L$2$ loss with the minimum loss being $\sigma^{2}$. Thus, we conclude that the minimum of L$2$ loss$$\mathbb{E}_{X}[(Y-f(X;\Theta))^{2}]$$is achieved for all $x$,$$\hat{f}(x;\Theta)=f(x).$$
+		\item[(b)]For notational convenience let $f_{0} = f(x_{0})$ and $\hat{f}_{0}=\hat{f}(x_{0};\Theta)$. Then, note that $\text{Var}[\hat{f}_{0}]$ is given by
+		\begin{equation}\label{eq:5}
+			\text{Var}[\hat{f}_{0}]=\mathbb{E}[\hat{f}_{0}^{2}]-(\mathbb{E}[\hat{f}_{0}])^{2},
+		\end{equation}
+		and $\text{Var}[y_{0}]$ is given by
+		\begin{equation}\label{eq:6}
+			\text{Var}[y_{0}]=\mathbb{E}[y_{0}^{2}]-(\mathbb{E}[y_{0}])^{2},
+		\end{equation}
+		which we can then further simplify since we know that $\mathbb{E}[\epsilon]=0$ (zero mean) and $\mathbb{E}(f_{0}) = f_{0}$ (since $f_{0}$ is deterministic.) This gives us$$\mathbb{E}[y_{0}]=\mathbb{E}[f_{0}+\epsilon]=\mathbb{E}[f_{0}]+\mathbb{E}[\epsilon]=f_{0}+0=f_{0},$$which can then be used to simplify $\text{Var}[y_{0}]$ by evaluating$$\mathbb{E}[(y_{0}-\mathbb{E}[y_{0}])^{2}]=\mathbb{E}[(f_{0}+\epsilon-f_{0})^{2}]=\mathbb{E}[\epsilon^{2}],$$ and then using the fact that $\text{Var}[\epsilon]=\sigma^{2}$ (by the question construction) we can also deduce $$\text{Var}[\epsilon]=\mathbb{E}[\epsilon^{2}]-(\mathbb{E}[\epsilon])^{2}=\mathbb{E}[\epsilon^{2}]=\sigma^{2}$$which implies that $\text{Var}[y_{0}]=\mathbb{E}[\epsilon^{2}]=\sigma^{2}$ which finally gives us
+		\begin{equation}\label{eq:7}
+			\text{Var}[y_{0}] = \sigma^{2}.
+		\end{equation}
+		Using our observations from above, we can then derive the bias variance decomposition as follows
+		\begin{align}
+			\mathbb{E}[(y_{0}-\hat{f}_{0})^{2}]&=\mathbb{E}[y_{0}^{2}-2y_{0}\hat{f}_{0}+\hat{f}_{0}^{2}]\nonumber\\
+			&=\mathbb{E}[y_{0}^{2}]-\mathbb{E}[2y_{0}\hat{f}_{0}]+\mathbb{E}[\hat{f}_{0}^{2}]&&\text{by linearity}\nonumber\\
+			&=\mathbb{E}[y_{0}^{2}]-\mathbb{E}[2y_{0}\hat{f}_{0}]+\text{Var}[\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}&&\text{by (\ref{eq:5})}\nonumber\\
+			&=\text{Var}[y_{0}]+(\mathbb{E}[y_{0}])^{2}-\mathbb{E}[2y_{0}\hat{f}_{0}]+\text{Var}[\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}&&\text{by (\ref{eq:6})}\nonumber\\
+			&=(\mathbb{E}[y_{0}])^{2}-\mathbb{E}[2y_{0}\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{re-arranging terms}\nonumber\\
+			&=f_{0}^{2}-\mathbb{E}[2y_{0}\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $\mathbb{E}[y_{0}]=f_{0}$}\nonumber\\
+			&=f_{0}^{2}-\mathbb{E}[2(f_{0}+\epsilon)\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $y_{0}=f_{0}+\epsilon$}\nonumber\\
+			&=f_{0}^{2}-\mathbb{E}[2f_{0}\hat{f}_{0}+2\epsilon\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{expanding terms}\nonumber\\
+			&=f_{0}^{2}-\mathbb{E}[2f_{0}\hat{f}_{0}]+\mathbb{E}[2\epsilon\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{by linearity}\nonumber\\
+			&=f_{0}^{2}-\mathbb{E}[2f_{0}\hat{f}_{0}]+\mathbb{E}[\epsilon][2\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $\epsilon$ is a random}\nonumber\\
+			& &&\text{independent variable}\nonumber\\
+			&=f_{0}^{2}-\mathbb{E}[2f_{0}\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $\mathbb{E}[\epsilon]=0$}\nonumber\\
+			&=f_{0}^{2}-2\mathbb{E}[f_{0}\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{take out constant}\nonumber\\
+			&=f_{0}^{2}-2\mathbb{E}[f_{0}]\mathbb{E}[\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $f_{0}$ and $\hat{f}_{0}$ are}\nonumber\\
+			& &&\text{independent}\nonumber\\
+			&=f_{0}^{2}-2f_{0}\mathbb{E}[\hat{f}_{0}]+(\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $f_{0}$ is determinsitic}\nonumber\\
+			&=(f_{0}-\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{factor terms}\nonumber\\
+			&=(\mathbb{E}[f_{0}]-\mathbb{E}[\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{since $f_{0}=\mathbb{E}[f_{0}]$}\nonumber\\
+			&=(\mathbb{E}[f_{0}-\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\text{Var}[y_{0}]&&\text{by linearity}\nonumber\\
+			&=(\mathbb{E}[f_{0}-\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\sigma^{2}&&\text{by (\ref{eq:7})}\nonumber\\
+			\therefore\mathbb{E}[(y_{0}-\hat{f}_{0})^{2}]&=(\mathbb{E}[f_{0}-\hat{f}_{0}])^{2}+\text{Var}[\hat{f}_{0}]+\sigma^{2},\nonumber
+		\end{align}
+		and then expanding on our notational convenience gives us the desired result$$\mathbb{E}[(y_{0}-\hat{f}(x_{0};\Theta))^{2}]=(\mathbb{E}[f(x_{0})-\hat{f}(x_{0};\Theta)])^{2}+\text{Var}[\hat{f}(x_{0};\Theta)]+\sigma^{2}$$which shows the bias-variance decomposition.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
