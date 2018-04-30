@@ -1,0 +1,76 @@
+\documentclass [10pt]{article}
+
+\textheight	8.7in
+\textwidth	6.5in
+\topmargin	    0in
+\oddsidemargin  0in
+\evensidemargin 0in
+\baselineskip 15pt
+
+\usepackage{amssymb,amsmath,amstext}
+\usepackage{amsfonts}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\allowdisplaybreaks
+
+\begin{document}
+\title{Intro to Machine Learning Homework Assignment 6}
+\author{Goktug Saatcioglu}
+\date{NetId: gs2417}
+\maketitle
+
+\begin{enumerate}
+	\item[\textbf{1.}]
+	\begin{enumerate}
+		\item[(a)]A common phenomenon with high-dimensional data vectors is that many machine learning algorithms may perform poorly due to the curse of dimensionality. The curse of dimensionality referes to the phenomenon of the generalization error first decreasing until a point as the dimensions of the data are increased and then starting to increase as even more dimensions are added. This happens because as we increase the dimensions of our data the data becomes more sparse which means we need more data observations for training in order to avoid overfitting for our model. However, most of the time increasing the number of observations is not a viable strategy as we would need huge amount of data points to process high dimensional data without overfitting. Thus, reducing the data to a lower dimensions allows us to avoid the curse of dimensionality and is a reason why it is more efficient to process data points if they are lower dimensional vectors.
+		\item[(b)]A potential trouble of reducing the dimensionality of the input vectors before training a classifier is that the reduced features are not easily interpretable for many of the algorithms we use for dimensionality reduction. This is especially true for both PCA and SVD and training on the reduced dataset makes it harder to interpret the results. A solution could be using a different algorithm for reduction where the reduced features are more interpretable. But then there still will be the issue of what constraints to choose including the question of how many features should we reduce the dimensions to. An aggressive approach could lead to a loss of crucial information which then could lead to a model that does not generalize well. We see that both the lack of interpretability of the reduced features and the choice of constraints including what dimensions to reduce to are potential troubles of reducing the dimensionality of the input vectors before training a classifier.
+	\end{enumerate}
+	\item[\textbf{2.}]
+	\begin{enumerate}
+		\item[(a)]We consider the reconstruction error over the whole training set $D$ where $N$ is the size of the set, $d$ is the original dimension of the set and $q$ is the dimension we reduce to (i.e. the $q$ eigenvectors components chosen). We can reconstruct any data vector $x^{i}$ from its reduced vector $z^{i}$ as follows:$$\hat{x}^{i}=\sum_{j=1}^{q}z^{i}_{j}w_{j}.$$The reconstruction error is then defined as$$\frac{1}{N}\sum_{i=1}^{N}\norm{x^{i}-\hat{x}^{i}}_{2}^{2}=\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{d}(x_{j}^{i}-\hat{x}_{j}^{i})^{2}$$and it easy to see that if $q=d$ then$$\hat{x}^{i}=x^{i}=\sum_{j=1}^{d}z^{i}_{j}w_{j}$$for all $i$ which gets us zero-reconstruction error. We also note that if $D$ is mean-centered such that $D=\{d^{1},\dots,d^{N}\}$ is tranformed to $D=\{d^{1}-\bar{d^{1}},\dots,d^{N}-\bar{d^{N}}\}=\{x^{1},\dots,x^{N}\}$ (where $\bar{d^{i}}$ is the mean of data vector $d^{i}$) then the covariance matrix $C$ is given by
+		\begin{equation}\label{eq:1}
+			C = \frac{1}{N}\sum_{i=1}^{N}x^{i}(x^{i})^{\top}.
+		\end{equation}
+		Using the re-writing of $x^{i}$ and (\ref{eq:1}) we get:
+		\begin{align}
+			\frac{1}{N}\sum_{i=1}^{N}\norm{x^{i}-\hat{x}^{i}}_{2}^{2}&=\frac{1}{N}\sum_{i=1}^{N}\norm{\sum_{j=1}^{d}z^{i}_{j}w_{j}-\sum_{j=1}^{q}z^{i}_{j}w_{j}}_{2}^{2}&&\text{by definition}\nonumber\\
+			&=\frac{1}{N}\sum_{i=1}^{N}\norm{\sum_{j=1}^{q}(z^{i}_{j}-z^{i}_{j})w_{j}+\sum_{j=q+1}^{d}z^{i}_{j}w_{j}}_{2}^{2}&&\text{re-arrange sums}\nonumber\\
+			&=\frac{1}{N}\sum_{i=1}^{N}\norm{\sum_{j=q+1}^{d}z^{i}_{j}w_{j}}_{2}^{2}&&\text{simplify}\nonumber\\
+			&=\frac{1}{N}\sum_{i=1}^{N}\sum_{j=q+1}^{d}(z^{i}_{j})^{2}\norm{w_j}^{2}&&\text{by definition}\nonumber\\
+			&=\frac{1}{N}\sum_{i=1}^{N}\sum_{j=q+1}^{d}(z^{i}_{j})^{2}&&\text{since $\norm{w_{j}}^{2}=1$}\nonumber\\
+			&=\frac{1}{N}\sum_{i=1}^{N}\sum_{j=q+1}^{d}(w_{j}^{\top}x^{i})((x^{i})^{\top}w_{j})&&\text{by definition}\nonumber\\
+			&=\frac{1}{N}\sum_{j=q+1}^{d}w_{j}^{\top}(\sum_{i=1}^{N}x^{i}(x^{i})^{\top})w_{j}&&\text{re-arrange sums}\nonumber\\
+			&=\frac{1}{N}\sum_{j=q+1}^{d}w_{j}^{\top}NCw_{j}&&\text{using (\ref{eq:1})}\nonumber\\
+			&=\sum_{j=q+1}^{d}w_{j}^{\top}Cw_{j}&&\text{take out the constant}\nonumber\\
+			\therefore\frac{1}{N}\sum_{i=1}^{N}\norm{x^{i}-\hat{x}^{i}}_{2}^{2}&=\sum_{j=q+1}^{d}w_{j}^{\top}Cw_{j},\nonumber
+		\end{align}
+		which proves the property we seek to prove.
+		\item[(b)]We again assume that the data has been mean centered and (\ref{eq:1}) holds. Given some data matrix $X=\{x_{1},\dots,x_{d}\}$ the covariance matrix $C$ of $X$ is defined as $C=XX^{\top}$ and the size of the dataset $X$ is given by $\left|X\right|=d$. To prove the statement in the question we must show that it holds for both the forward direction ($\implies$) and the backward direction ($\impliedby$). Beginning with the forward direction ($\implies$), we know that to find the eigendecomposition of a square matrix for PCA the matrix must be diagonalizable. Thus, if $W$ is the matrix that diagonalizes $C$ then the eigenvalues of $C$ can be obtained by$$W^{-1}CW=\Sigma$$where $W$ is the matrix of the eigenvectors of $C$. By the construction of $C$ we know that in this case $W^{-1}=W^{T}$ (meaning $W$ is orthogonal) and this fact can be proven through the equivalence of the eigendecomposition of $C$ and the singular value decomposition of $C$. Using this fact we get$$W^{\top}CW=\Sigma$$which is enough to prove the forward direction. However, for the sake of completeness consider the following derivation:
+		\begin{align}
+			W^{\top}CW&=W^{\top}XX^{\top}W&&\text{since $C=XX^{\top}$}\nonumber\\
+			&=ZX^{\top}W&&\text{since $Z=W^{\top}X$}\nonumber\\
+			&=ZZ^{\top}&&\text{since $Z^{\top}=X^{\top}W$}\nonumber\\
+			&=\sum_{j=1}^{d}z_{j}z_{j}^{\top}&&\text{by definition}\nonumber\\
+			&=\sum_{j=1}^{d}w_{j}^{\top}x_{j}x_{j}^{\top}w_{j}&&\text{by definition}\nonumber\\
+			&=\sum_{j=1}^{d}w_{j}^{\top}Cw_{j}&&\text{by definition of $C$}\nonumber\\
+			\therefore W^{\top}CW&=\sum_{j=1}^{d}w_{j}^{\top}Cw_{j}.\nonumber
+		\end{align}
+		Since we know that $W^{\top}CW=\sum_{j=1}^{d}w_{j}^{\top}Cw_{j}$ and that $W^{\top}CW=\Sigma=\text{diag}(\sigma_{1}^{2},\dots,\sigma_{q}^{2})$ we conclude that$$\Sigma=W^{\top}CW\implies \sigma_{j}^{2}=w_{j}^{\top}Cw_{j},\text{\:\:for all $j=1,\dots,d$},$$which finishes the $\implies$ portion of this proof. Now let's consider the backward direction ($\impliedby$), if$$\sigma_{j}^{2}=w_{j}^{\top}Cw_{j},\text{\:\:for all $j=1,\dots,d$}$$ is true then the following derivation is possible:
+		\begin{align}
+			\Sigma&=\text{diag}(w_{1}^{\top}Cw_{1},\dots,w_{d}^{\top}Cw_{d})&&\text{by assumption}\nonumber\\
+			&=\sum_{j=1}^{d}w_{j}^{\top}Cw_{j}&&\text{by definition}\nonumber\\
+			&=\sum_{j=1}^{d}w_{j}^{\top}x_{j}x_{j}^{\top}w_{j}&&\text{by definition of $C$}\nonumber\\
+			&=\sum_{j=1}^{d}z_{j}z_{j}^{\top}&&\text{by definition}\nonumber\\
+			&=ZZ^{\top}&&\text{by definition}\nonumber\\
+			&=ZX^{\top}W&&\text{since $Z^{\top}=X^{\top}W$}\nonumber\\
+			&=W^{\top}XX^{\top}W&&\text{since $Z=W^{\top}X$}\nonumber\\
+			&=W^{\top}CW&&\text{since $XX^{\top}=C$}\nonumber\\
+			\therefore\Sigma&=W^{\top}CW.\nonumber
+		\end{align}
+		This derivation completes $\impliedby$ portion of this proof. Since we have proved that both $\implies$ and $\impliedby$ holds we can say that the $\iff$ holds and we have shown the property we seek to show.
+	\end{enumerate}
+	\item[\textbf{3.}]See hw6\_pca.ipynb and hw6\_nmf.ipynb.
+\end{enumerate}
+
+\end{document}
